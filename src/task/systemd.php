@@ -35,33 +35,24 @@ set('systemd_local_path', 'etc/systemd');
 set('systemd_remote_path', '~/.config/systemd/user');
 
 task('systemd:stop', static function (): void {
-    $files = getRemoteSystemdFiles();
+    $files = RemoteSystemdFileManager::getAll();
 
     foreach ($files as $file) {
         run(sprintf('systemctl --user stop %s', $file));
         run(sprintf('systemctl --user disable %s', $file));
     }
-})->desc('This will stop any systemd services');
+})->desc('This will stop all systemd services');
 
 task('systemd:start', static function (): void {
     run('systemctl --user daemon-reload');
 
-    $files = getRemoteSystemdFiles();
+    $files = RemoteSystemdFileManager::getByStageAndRelease(get('stage'), get('release_name'));
 
     foreach ($files as $file) {
         run(sprintf('systemctl --user enable %s', $file));
         run(sprintf('systemctl --user start %s', $file));
     }
 })->desc('This will start any systemd services');
-
-task('systemd:remove', static function (): void {
-    // todo create backup of these if the deployment fails
-    $files = getRemoteSystemdFiles();
-
-    foreach ($files as $file) {
-        run(sprintf('rm %s', $file));
-    }
-})->desc('Removes any systemd service files in the remote file system');
 
 task('systemd:upload', static function (): void {
     $stage = get('stage');
@@ -78,7 +69,20 @@ task('systemd:upload', static function (): void {
 
         upload(
             $file->getRelativePathname(),
-            sprintf('%s/%s---%s.%s', $remotePath, $file->getFilenameWithoutExtension(), $stage, $file->getExtension())
+            sprintf('%s/%s', $remotePath, RemoteSystemdFileManager::getRemoteFilename($file->getFilename(), $stage, get('release_name')))
         );
     }
 })->desc('This will upload any systemd files to the remote path');
+
+task('systemd:cleanup', static function (): void {
+    $releasesList = get('releases_list');
+    if (!isset($releasesList[1])) {
+        return;
+    }
+
+    $files = RemoteSystemdFileManager::getByStageAndRelease(get('stage'), $releasesList[1]);
+
+    foreach ($files as $file) {
+        run(sprintf('rm %s', $file));
+    }
+})->desc('Remove systemd service files from previous release');
