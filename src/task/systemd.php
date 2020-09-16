@@ -27,6 +27,9 @@ use Symfony\Component\Finder\Finder;
  *
  * This structure allows you to put services that should run on all stage in the root
  * and services that should only run in a specific env you can put in the respective folder
+ *
+ * NOTICE: Do not name the files in the root dir the same as any of the files in the subdirs.
+ * If you do that, only one of the files will be uploaded
  */
 set('systemd_local_path', 'etc/systemd');
 set('systemd_remote_path', '~/.config/systemd/user');
