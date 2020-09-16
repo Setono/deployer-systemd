@@ -9,7 +9,6 @@ use function Deployer\run;
 use function Deployer\set;
 use function Deployer\task;
 use function Deployer\upload;
-use function Safe\preg_split;
 use function Safe\sprintf;
 use Symfony\Component\Finder\Finder;
 
@@ -80,13 +79,3 @@ task('systemd:upload', static function (): void {
         );
     }
 })->desc('This will upload any systemd files to the remote path');
-
-/**
- * @return string[]
- */
-function getRemoteSystemdFiles(): array
-{
-    $output = run('find {{systemd_local_path}} -type f -name "*.service"');
-
-    return preg_split('/[\r\n]+/', $output);
-}

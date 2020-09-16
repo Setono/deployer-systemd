@@ -32,7 +32,8 @@
             "Setono\\Deployer\\Systemd\\": "src/"
         },
         "files": [
-            "src/autoload.php"
+            "src/autoload.php",
+            "src/functions.php"
         ]
     },
     "prefer-stable": true,
