@@ -1,0 +1,45 @@
+{
+    "name": "setono/deployer-systemd",
+    "type": "library",
+    "description": "Manage systemd services",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Joachim Løvgaard",
+            "email": "joachim@loevgaard.dk"
+        }
+    ],
+    "require": {
+        "php": "^7.4",
+        "deployer/deployer": "^6.0 || ^7.0",
+        "symfony/finder": "^4.4 || ^5.0",
+        "thecodingmachine/safe": "^1.0",
+        "webmozart/assert": "^1.0"
+    },
+    "require-dev": {
+        "setono/code-quality-pack": "^1.4"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Setono\\Deployer\\Systemd\\": "src/"
+        },
+        "files": [
+            "src/autoload.php"
+        ]
+    },
+    "prefer-stable": true,
+    "scripts": {
+        "analyse": "phpstan analyse -c phpstan.neon -l max src",
+        "check-style": "ecs check --ansi src/",
+        "fix-style": "ecs check --fix --ansi src/",
+        "phpunit": "phpunit"
+    }
+}
