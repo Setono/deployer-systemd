@@ -20,6 +20,7 @@ final class RemoteSystemdFileManager
     {
         $pathInfo = pathinfo($filename);
         Assert::keyExists($pathInfo, 'extension');
+        Assert::stringNotEmpty($pathInfo['extension']);
 
         return sprintf('%s---%s---r%s.%s', $pathInfo['filename'], $stage, $release, $pathInfo['extension']);
     }
