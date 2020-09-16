@@ -56,7 +56,7 @@ final class RemoteSystemdFileManager
     {
         $path = $path ?? self::$defaultPath;
 
-        $output = run(sprintf('find %s -type f -name "*---r%s.service"', $path, $release));
+        $output = run(sprintf('find %s -type f -name "*---*---r%s.service"', $path, $release));
 
         return self::handleOutput($output);
     }
@@ -68,7 +68,7 @@ final class RemoteSystemdFileManager
     {
         $path = $path ?? self::$defaultPath;
 
-        $output = run(sprintf('find %s -type f -name "*%s---%s.service"', $path, $stage, $release));
+        $output = run(sprintf('find %s -type f -name "*---%s---r%s.service"', $path, $stage, $release));
 
         return self::handleOutput($output);
     }
