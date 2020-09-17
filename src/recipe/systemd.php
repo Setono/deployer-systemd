@@ -16,6 +16,8 @@ after('deploy:symlink', 'systemd:start');
 
 // cleanup created files
 after('cleanup', 'systemd:cleanup');
+
+// handle failure
 after('deploy:failed', 'systemd:on-fail');
 after('systemd:on-fail', 'systemd:cleanup');
 after('systemd:on-fail', 'systemd:start');
