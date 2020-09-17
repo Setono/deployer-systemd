@@ -45,9 +45,9 @@
     },
     "prefer-stable": true,
     "scripts": {
-        "analyse": "phpstan analyse -c phpstan.neon -l max src",
-        "check-style": "ecs check --ansi src/",
-        "fix-style": "ecs check --fix --ansi src/",
+        "analyse": "phpstan analyse -c phpstan.neon",
+        "check-style": "ecs check --ansi src/ tests/",
+        "fix-style": "ecs check --fix --ansi src/ tests/",
         "phpunit": "phpunit"
     }
 }

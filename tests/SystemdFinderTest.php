@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Setono\Deployer\Systemd;
@@ -9,6 +10,7 @@ use Symfony\Component\Process\Process;
 final class SystemdFinderTest extends TestCase
 {
     private const PATH = __DIR__ . '/systemd';
+
     /**
      * @test
      */
@@ -85,16 +87,17 @@ final class SystemdFinderTest extends TestCase
 
     private static function getCallback(): callable
     {
-        return static function(string $command): string {
+        return static function (string $command): string {
             $process = Process::fromShellCommandline($command);
             $process->run();
+
             return $process->getOutput();
         };
     }
 
     private static function assertFiles(array $expected, array $actual): void
     {
-        $actual = array_map(static function(string $path): string {
+        $actual = array_map(static function (string $path): string {
             return basename($path);
         }, $actual);
 

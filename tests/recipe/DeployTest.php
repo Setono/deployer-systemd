@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Setono\Deployer\Systemd\recipe;
@@ -6,13 +7,12 @@ namespace Setono\Deployer\Systemd\recipe;
 use Deployer\Console\Application;
 use Deployer\Deployer;
 use PHPUnit\Framework\TestCase;
+use function Safe\sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
 final class DeployTest extends TestCase
 {
-    private const DEPLOY_PATH = __DIR__ . '/../../.build';
-
     private ApplicationTester $tester;
 
     private Deployer $deployer;
@@ -47,6 +47,8 @@ final class DeployTest extends TestCase
             $deployPath = $host->get('deploy_path');
             exec("rm -rf $deployPath");
         }
+
+        exec(sprintf('rm -rf %s', $this->deployer->config->get('systemd_remote_path')));
     }
 
     public static function tearDownAfterClass(): void
@@ -62,7 +64,7 @@ final class DeployTest extends TestCase
     {
         $this->tester->run([
             'deploy',
-            '-f' => __DIR__ . '/deploy.php'
+            '-f' => __DIR__ . '/deploy.php',
         ], [
             'verbosity' => OutputInterface::VERBOSITY_NORMAL,
             'interactive' => false,

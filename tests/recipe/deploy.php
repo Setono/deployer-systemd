@@ -1,17 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Setono\Deployer\Systemd\recipe;
 
-use Setono\Deployer\Systemd\RemoteSystemdFileManager;
 use function Deployer\desc;
 use function Deployer\fail;
-use function Deployer\get;
 use function Deployer\localhost;
 use function Deployer\run;
 use function Deployer\set;
 use function Deployer\task;
 use function Deployer\writeln;
-use function Safe\sprintf;
 
 require_once 'vendor/deployer/deployer/recipe/common.php';
 require_once 'recipe/systemd.php';
@@ -42,7 +41,7 @@ task('deploy', [
     'deploy:symlink',
     'deploy:unlock',
     'cleanup',
-    'success'
+    'success',
 ]);
 
 desc('Test deploy fail');
@@ -58,7 +57,7 @@ task('deploy_fail', [
     'deploy:symlink',
     'deploy:unlock',
     'cleanup',
-    'success'
+    'success',
 ]);
 
 task('fail', 'unknown_command');
