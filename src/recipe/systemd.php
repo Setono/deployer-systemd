@@ -9,11 +9,13 @@ use function Deployer\before;
 
 require_once 'task/systemd.php';
 
-before('deploy:prepare', 'systemd:stop');
-after('deploy:release', 'systemd:upload');
+before('deploy:symlink', 'systemd:stop');
+after('systemd:stop', 'systemd:upload');
 
 after('deploy:symlink', 'systemd:start');
 
 // cleanup created files
 after('cleanup', 'systemd:cleanup');
-after('deploy:failed', 'systemd:cleanup');
+after('deploy:failed', 'systemd:on-fail');
+after('systemd:on-fail', 'systemd:cleanup');
+after('systemd:on-fail', 'systemd:start');

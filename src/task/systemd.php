@@ -34,6 +34,32 @@ use Symfony\Component\Finder\Finder;
 set('systemd_local_path', 'etc/systemd');
 set('systemd_remote_path', '~/.config/systemd/user');
 
+/**
+ * This is the release to cleanup when the deployment has finished
+ *
+ * NOTICE that when the deployment fails, this parameter is changed to the release that was supposed to have
+ * been deployed and not the previous release as this function does by default
+ *
+ * This is handled in the systemd:on-fail task
+ */
+set('systemd_cleanup_release', static function (): ?string {
+    $releasesList = get('releases_list');
+
+    return $releasesList[1] ?? null;
+});
+
+/**
+ * This is the release to start when the deployment has finished
+ *
+ * NOTICE that when the deployment fails, this parameter is changed to the previous release instead of the
+ * release that should have been deployed
+ *
+ * This is handled in the systemd:on-fail task
+ */
+set('systemd_start_release', static function (): string {
+    return get('release_name');
+});
+
 task('systemd:stop', static function (): void {
     $files = RemoteSystemdFileManager::getByStage(get('stage'));
 
@@ -79,16 +105,24 @@ task('systemd:upload', static function (): void {
     }
 })->desc('This will upload any systemd files to the remote path');
 
-task('systemd:cleanup', static function (): void {
-    // todo what does the 'releases_list' contain when a deployment fails?
-    $releasesList = get('releases_list');
-    if (!isset($releasesList[1])) {
-        return;
-    }
+/**
+ * Should be called immediately after deploy:failed
+ */
+task('systemd:on-fail', static function (): void {
+    set('systemd_cleanup_release', get('release_name'));
 
-    $files = RemoteSystemdFileManager::getByStageAndRelease(get('stage'), $releasesList[1]);
+    $releasesList = get('releases_list');
+    if (isset($releasesList[1])) {
+        set('systemd_start_release', $releasesList[1]);
+    }
+})->desc('Handles the event where deployment fails');
+
+task('systemd:cleanup', static function (): void {
+    $release = get('systemd_cleanup_release');
+
+    $files = RemoteSystemdFileManager::getByStageAndRelease(get('stage'), $release);
 
     foreach ($files as $file) {
         run(sprintf('rm %s', $file));
     }
-})->desc('Remove systemd service files from previous release');
+})->desc('Remove unused systemd service files');
