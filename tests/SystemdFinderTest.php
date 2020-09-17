@@ -17,11 +17,12 @@ final class SystemdFinderTest extends TestCase
         $files = SystemdFinder::findAll(self::PATH, self::getCallback());
 
         self::assertFiles([
-            'service1.service',
-            'service2---dev.service',
-            'service3---prod.service',
-            'service4---dev---r23.service',
-            'service5---dev---r24.service',
+            'service.service',
+            'service---dev.service',
+            'service---dev---r23.service',
+            'service---dev---r24.service',
+            'service---prod.service',
+            'service---prod-r23.service',
         ], $files);
     }
 
@@ -33,9 +34,9 @@ final class SystemdFinderTest extends TestCase
         $files = SystemdFinder::findByStage(self::PATH, 'dev', self::getCallback());
 
         self::assertFiles([
-            'service2---dev.service',
-            'service4---dev---r23.service',
-            'service5---dev---r24.service',
+            'service---dev.service',
+            'service---dev---r23.service',
+            'service---dev---r24.service',
         ], $files);
     }
 
@@ -47,7 +48,8 @@ final class SystemdFinderTest extends TestCase
         $files = SystemdFinder::findByStage(self::PATH, 'prod', self::getCallback());
 
         self::assertFiles([
-            'service3---prod.service'
+            'service---prod.service',
+            'service---prod-r23.service',
         ], $files);
     }
 
@@ -68,7 +70,7 @@ final class SystemdFinderTest extends TestCase
         $files = SystemdFinder::findByStageAndRelease(self::PATH, 'dev', '23', self::getCallback());
 
         self::assertFiles([
-            'service4---dev---r23.service',
+            'service---dev---r23.service',
         ], $files);
     }
 
