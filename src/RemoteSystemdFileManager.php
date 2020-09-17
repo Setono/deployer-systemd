@@ -10,7 +10,7 @@ use Webmozart\Assert\Assert;
 
 final class RemoteSystemdFileManager
 {
-    private static string $defaultPath = '{{systemd_local_path}}';
+    private static string $defaultPath = '{{systemd_remote_path}}';
 
     /**
      * Returns a string like my-service---prod---r34.service
@@ -40,16 +40,6 @@ final class RemoteSystemdFileManager
     public static function getByStage(string $stage, string $path = null): array
     {
         return SystemdFinder::findByStage($path ?? self::$defaultPath, $stage, static function (string $command): string {
-            return run($command);
-        });
-    }
-
-    /**
-     * @return string[]
-     */
-    public static function getByRelease(string $release, string $path = null): array
-    {
-        return SystemdFinder::findByRelease($path ?? self::$defaultPath, $release, static function (string $command): string {
             return run($command);
         });
     }

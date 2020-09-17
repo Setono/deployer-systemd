@@ -32,16 +32,6 @@ final class SystemdFinder
     /**
      * @return string[]
      */
-    public static function findByRelease(string $path, string $release, callable $callable): array
-    {
-        $output = $callable(sprintf('find %s -type f -name "*---*---r%s.service"', $path, $release));
-
-        return self::handleOutput($output);
-    }
-
-    /**
-     * @return string[]
-     */
     public static function findByStageAndRelease(string $path, string $stage, string $release, callable $callable): array
     {
         $output = $callable(sprintf('find %s -type f -name "*---%s---r%s.service"', $path, $stage, $release));

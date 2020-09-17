@@ -38,6 +38,7 @@ task('systemd:stop', static function (): void {
     $files = RemoteSystemdFileManager::getByStage(get('stage'));
 
     foreach ($files as $file) {
+        // todo I don't know what happens if you try to disable and stop services that are not enabled/started
         run(sprintf('systemctl --user stop %s', $file));
         run(sprintf('systemctl --user disable %s', $file));
     }
@@ -46,6 +47,7 @@ task('systemd:stop', static function (): void {
 task('systemd:start', static function (): void {
     run('systemctl --user daemon-reload');
 
+    // todo what is the 'release_name' when a deployment fails?
     $files = array_merge(
         RemoteSystemdFileManager::getByStageAndRelease(get('stage'), get('release_name')),
         RemoteSystemdFileManager::getByStage(get('stage'))
@@ -78,6 +80,7 @@ task('systemd:upload', static function (): void {
 })->desc('This will upload any systemd files to the remote path');
 
 task('systemd:cleanup', static function (): void {
+    // todo what does the 'releases_list' contain when a deployment fails?
     $releasesList = get('releases_list');
     if (!isset($releasesList[1])) {
         return;
