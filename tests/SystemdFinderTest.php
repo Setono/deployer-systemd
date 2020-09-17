@@ -21,6 +21,7 @@ final class SystemdFinderTest extends TestCase
             'service2---dev.service',
             'service3---prod.service',
             'service4---dev---r23.service',
+            'service5---dev---r24.service',
         ], $files);
     }
 
@@ -34,6 +35,7 @@ final class SystemdFinderTest extends TestCase
         self::assertFiles([
             'service2---dev.service',
             'service4---dev---r23.service',
+            'service5---dev---r24.service',
         ], $files);
     }
 
@@ -61,27 +63,6 @@ final class SystemdFinderTest extends TestCase
     /**
      * @test
      */
-    public function it_finds_by_release(): void
-    {
-        $files = SystemdFinder::findByRelease(self::PATH, '23', self::getCallback());
-
-        self::assertFiles([
-            'service4---dev---r23.service',
-        ], $files);
-    }
-
-    /**
-     * @test
-     */
-    public function it_does_not_find_other_release(): void
-    {
-        $files = SystemdFinder::findByRelease(self::PATH, '24', self::getCallback());
-        self::assertEmpty($files);
-    }
-
-    /**
-     * @test
-     */
     public function it_finds_by_stage_and_release(): void
     {
         $files = SystemdFinder::findByStageAndRelease(self::PATH, 'dev', '23', self::getCallback());
@@ -89,6 +70,15 @@ final class SystemdFinderTest extends TestCase
         self::assertFiles([
             'service4---dev---r23.service',
         ], $files);
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_find_other_release_and_stage(): void
+    {
+        $files = SystemdFinder::findByStageAndRelease(self::PATH, 'dev', '25', self::getCallback());
+        self::assertEmpty($files);
     }
 
     private static function getCallback(): callable
