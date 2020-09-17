@@ -4,3 +4,4 @@
 /easy-coding-standard.yaml  export-ignore
 /phpstan.neon               export-ignore
 /README.md                  export-ignore
+/tests                      export-ignore

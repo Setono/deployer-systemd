@@ -157,3 +157,46 @@ jobs:
 
             -   name: "Run phpstan/phpstan"
                 run: "composer analyse"
+
+    unit-tests:
+        name: "Unit tests"
+
+        runs-on: "ubuntu-latest"
+
+        strategy:
+            matrix:
+                php-version:
+                    - "7.4"
+
+                dependencies:
+                    - "lowest"
+                    - "highest"
+
+        steps:
+            -   name: "Checkout"
+                uses: "actions/checkout@v2"
+
+            -   name: "Setup PHP, with composer and extensions"
+                uses: "shivammathur/setup-php@v2"
+                with:
+                    php-version: "${{ matrix.php-version }}"
+                    extensions: "${{ env.PHP_EXTENSIONS }}"
+                    coverage: "none"
+
+            -   name: "Determine composer cache directory"
+                uses: "./.github/actions/composer/composer/determine-cache-directory"
+
+            -   name: "Cache composer dependencies"
+                uses: "actions/cache@v2"
+                with:
+                    path: "${{ env.COMPOSER_CACHE_DIR }}"
+                    key: "php-${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-${{ hashFiles('composer.lock') }}"
+                    restore-keys: "php-${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-"
+
+            -   name: "Install ${{ matrix.dependencies }} dependencies with composer"
+                uses: "./.github/actions/composer/composer/install"
+                with:
+                    dependencies: "${{ matrix.dependencies }}"
+
+            -   name: "Run phpunit"
+                run: "composer phpunit"

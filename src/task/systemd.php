@@ -35,24 +35,27 @@ set('systemd_local_path', 'etc/systemd');
 set('systemd_remote_path', '~/.config/systemd/user');
 
 task('systemd:stop', static function (): void {
-    $files = RemoteSystemdFileManager::getAll();
+    $files = RemoteSystemdFileManager::getByStage(get('stage'));
 
     foreach ($files as $file) {
         run(sprintf('systemctl --user stop %s', $file));
         run(sprintf('systemctl --user disable %s', $file));
     }
-})->desc('This will stop all systemd services');
+})->desc('This will stop all systemd services for the running stage');
 
 task('systemd:start', static function (): void {
     run('systemctl --user daemon-reload');
 
-    $files = RemoteSystemdFileManager::getByStageAndRelease(get('stage'), get('release_name'));
+    $files = array_merge(
+        RemoteSystemdFileManager::getByStageAndRelease(get('stage'), get('release_name')),
+        RemoteSystemdFileManager::getByStage(get('stage'))
+    );
 
     foreach ($files as $file) {
         run(sprintf('systemctl --user enable %s', $file));
         run(sprintf('systemctl --user start %s', $file));
     }
-})->desc('This will start any systemd services');
+})->desc('This will start all systemd services for this release AND all services not having a release (i.e. manual services)');
 
 task('systemd:upload', static function (): void {
     $stage = get('stage');

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Setono\Deployer\Systemd;
 
 use function Deployer\run;
-use function Safe\preg_split;
 use function Safe\sprintf;
 use Webmozart\Assert\Assert;
 
@@ -30,11 +29,9 @@ final class RemoteSystemdFileManager
      */
     public static function getAll(string $path = null): array
     {
-        $path = $path ?? self::$defaultPath;
-
-        $output = run(sprintf('find %s -type f -name "*.service"', $path));
-
-        return self::handleOutput($output);
+        return SystemdFinder::findAll($path ?? self::$defaultPath, static function (string $command): string {
+            return run($command);
+        });
     }
 
     /**
@@ -42,11 +39,9 @@ final class RemoteSystemdFileManager
      */
     public static function getByStage(string $stage, string $path = null): array
     {
-        $path = $path ?? self::$defaultPath;
-
-        $output = run(sprintf('find %s -type f -name "*---%s---*.service"', $path, $stage));
-
-        return self::handleOutput($output);
+        return SystemdFinder::findByStage($path ?? self::$defaultPath, $stage, static function (string $command): string {
+            return run($command);
+        });
     }
 
     /**
@@ -54,11 +49,9 @@ final class RemoteSystemdFileManager
      */
     public static function getByRelease(string $release, string $path = null): array
     {
-        $path = $path ?? self::$defaultPath;
-
-        $output = run(sprintf('find %s -type f -name "*---*---r%s.service"', $path, $release));
-
-        return self::handleOutput($output);
+        return SystemdFinder::findByRelease($path ?? self::$defaultPath, $release, static function (string $command): string {
+            return run($command);
+        });
     }
 
     /**
@@ -66,18 +59,8 @@ final class RemoteSystemdFileManager
      */
     public static function getByStageAndRelease(string $stage, string $release, string $path = null): array
     {
-        $path = $path ?? self::$defaultPath;
-
-        $output = run(sprintf('find %s -type f -name "*---%s---r%s.service"', $path, $stage, $release));
-
-        return self::handleOutput($output);
-    }
-
-    /**
-     * @return string[]
-     */
-    private static function handleOutput(string $output): array
-    {
-        return preg_split('/[\r\n]+/', $output);
+        return SystemdFinder::findByStageAndRelease($path ?? self::$defaultPath, $stage, $release, static function (string $command): string {
+            return run($command);
+        });
     }
 }
