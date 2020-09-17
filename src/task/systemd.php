@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Setono\Deployer\Systemd;
 
 use function Deployer\get;
+use function Deployer\has;
 use function Deployer\run;
 use function Deployer\set;
 use function Deployer\task;
 use function Deployer\upload;
 use function Safe\sprintf;
 use Symfony\Component\Finder\Finder;
+use Webmozart\Assert\Assert;
 
 /**
  * The directory structure of this path should be as follows
@@ -60,6 +62,15 @@ set('systemd_start_release', static function (): string {
     return get('release_name');
 });
 
+task('systemd:prepare', static function (): void {
+    if (!has('stage')) {
+        // if a stage isn't set then we presume the stage to be prod since you are only deploying to one place
+        set('stage', 'prod');
+    }
+
+    run('mkdir -p {{systemd_remote_path}}');
+})->desc('Prepares parameters that this systemd library needs');
+
 task('systemd:stop', static function (): void {
     $files = RemoteSystemdFileManager::getByStage(get('stage'));
 
@@ -98,8 +109,11 @@ task('systemd:upload', static function (): void {
             continue;
         }
 
+        $filePath = $file->getRealPath();
+        Assert::notFalse($filePath, "The file, '$file', does not exist");
+
         upload(
-            $file->getRelativePathname(),
+            $filePath,
             sprintf('%s/%s', $remotePath, RemoteSystemdFileManager::getRemoteFilename($file->getFilename(), $stage, get('release_name')))
         );
     }
@@ -119,6 +133,9 @@ task('systemd:on-fail', static function (): void {
 
 task('systemd:cleanup', static function (): void {
     $release = get('systemd_cleanup_release');
+    if (null === $release) {
+        return;
+    }
 
     $files = RemoteSystemdFileManager::getByStageAndRelease(get('stage'), $release);
 

@@ -9,8 +9,10 @@ use function Deployer\before;
 
 require_once 'task/systemd.php';
 
-before('deploy:symlink', 'systemd:stop');
-after('systemd:stop', 'systemd:upload');
+before('deploy:prepare', 'systemd:prepare');
+
+before('deploy:symlink', 'systemd:upload');
+before('systemd:upload', 'systemd:stop');
 
 after('deploy:symlink', 'systemd:start');
 
